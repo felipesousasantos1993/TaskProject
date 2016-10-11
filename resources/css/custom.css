@@ -1,0 +1,10 @@
+.material-icons {
+	position: relative;
+	top: 6px;
+}
+
+.no-link {
+	text-decoration: none;
+	text-transform: none !important;
+	color: #333;
+}
