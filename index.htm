@@ -1,0 +1,218 @@
+<!DOCTYPE HTML>
+<html lang="pt-BR" ng-app="taskApp">
+<head >
+	<title>	
+		TaskProject
+	</title>
+	<meta charset="utf-8"/>
+	<link rel="stylesheet" href="resources/css/bootstrap.min.css"></link>
+	<link rel="X-SourceMap" href="resources/css/bootstrap.min.css.map"></link>
+	<link rel="stylesheet" href="resources/css/bootstrap-theme.min.css"></link>
+	<link rel="X-SourceMap" href="resources/css/bootstrap-theme.min.css.map"></link>
+	<link rel="stylesheet" href="resources/css/datatables.min.css"></link>
+	<link rel="stylesheet" href="resources/css/bootstrap-datetimepicker.min.css"></link>
+	<link rel="stylesheet" href="resources/css/bootstrap-select.min.css"></link>
+
+
+	<link rel="stylesheet" href="resources/css/custom.css"></link>
+
+	<script src="resources/js/jquery-2.1.4.min.js"></script>
+	<script src="resources/js/angular.min.js"></script>	
+	<script src="resources/js/bootstrap.min.js"></script>
+	<script src="resources/js/datatables.min.js"></script>
+	<script src="resources/js/moment.js"></script>
+	<script src="resources/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="resources/js/jquery.mask.min.js"></script>	
+	<script src="resources/js/bootstrap-select.min.js"></script>	
+
+	<script src="resources/js/app.js"></script>
+</head>
+<body ng-controller="taskController">
+	<header>
+		<nav class="navbar navbar-default">
+			<div class="container-fluid">
+				<!-- Brand and toggle get grouped for better mobile display -->
+				<div class="navbar-header">
+					<a class="navbar-brand" href="#">TaskProject</a>
+				</div>
+			</div>
+		</nav>
+	</header>
+	<form id="taskForm" name="taskForm" novalidate>
+		<div class="container">
+			<div class="row" ng-show="msgs.msg.length">
+				<div class="col-md-12">
+					<div class="alert alert-{{msgs.tipo}}" >
+						<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+						{{msgs.msg}}
+					</div>
+				</div>
+			</div>
+			<div class="row" ng-show="operacao === 'A'">
+				<div class="col-md-2">
+					<div class="form-group">
+						<label for="tarefa">Código</label>
+						<input id="tarefa" value="{{tarefa.codigo | zeroAEsquerda:5}}" class="form-control" disabled="disabled" />
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6">
+					<div class="form-group">
+						<label for="tarefa">Título</label>
+						<input id="tarefa" ng-model="tarefa.titulo" class="form-control" required="true" maxlength="50" />
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<div class="form-group">
+						<label for="tarefa">Descrição</label>
+						<input id="tarefa" ng-model="tarefa.descricao" class="form-control" required="true" />
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-3">
+					<div class="form-group">
+						<label for="data">Data</label>
+						<input id="data" ng-model="tarefa.data"  class="form-control datepicker data-hora" required="true" />
+					</div>
+				</div>
+			</div>
+			<div class="row" ng-show="operacao === 'A'">
+				<div class="col-md-3">
+					<div class="form-group">
+						<label for="data">Situação</label>
+						<select ng-options="obj.value as obj.text for obj in situacoes" ng-model="tarefa.situacao" class="selectpicker">
+
+						</select>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-2">
+					<div class="form-group">
+						<label for="data">Prioridade</label>
+						<select ng-options="obj.value as obj.text for obj in prioridades" ng-model="tarefa.prioridade" class="selectpicker" required="true">
+
+						</select>
+					</div>
+				</div>
+			</div> 
+			<div class="row form-actions">
+				<div class="col-md-2">
+					<button class="btn btn-primary" type="subtmit" ng-click="incluir()" ng-show="operacao === 'I'">Incluir</button>
+					<button class="btn btn-primary" type="subtmit" ng-click="alterar()" ng-show="operacao === 'A'">Alterar</button>
+					<button class="btn btn-default" type="button" ng-click="cancelar()" ng-show="operacao === 'A'">Cancelar</button>
+				</div>
+			</div>
+
+			<table class="table table-bordered table-striped datatable" ng-init="init()">
+				<thead>
+					<th>Código</th>
+					<th>Título</th>
+					<th>Situação</th>
+					<th>Ação</th>
+				</thead>
+				<tbody>
+					<tr ng-repeat="t in tarefas track by $index">
+						<td class="text-center">{{t.codigo | zeroAEsquerda:5}}</td>												|
+						<td>{{t.titulo}}</td>		
+						<td class="text-center">
+							<span class="label label-primary" ng-show="t.situacao === '1'">Nova</span>
+							<span class="label label-warning" ng-show="t.situacao === '2'">Em Andamento</span>
+							<span class="label label-default" ng-show="t.situacao === '3'">Fechada</span></td>
+							<span class="label label-danger" ng-show="t.situacao === '4'">Reaberta</span></td>
+							<td class="text-center"><button class="btn btn-xs btn-primary" type="button" ng-click="selecionar(t, $index, 'A')">Editar</button>
+								<button class="btn btn-xs btn-success" type="button" data-toggle="modal" ng-click="selecionar(t, $index, 'D')" data-target="#modalDetalhar">Detalhar</button>
+								<button class="btn btn-xs btn-danger" type="button" data-toggle="modal" ng-click="selecionar(t, $index, 'E')" data-target="#modalExcluir">Excluir</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div id="modalDetalhar" class="modal fade" tabindex="-1" role="dialog">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+							<h4 class="modal-title">Detalhar Tarefa</h4>
+						</div>
+						<div class="modal-body">
+							<div class="row"> 
+								<div class="col-md-12">
+									<label>Código</label>
+								</div>
+								<div class="col-md-12">
+									<span>{{tarefa.codigo | zeroAEsquerda:5}}</span>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-12">
+									<label>Descrição</label>
+								</div>
+								<div class="col-md-12">
+									<span>{{tarefa.descricao}}</span>
+								</div>			
+							</div>				
+							<div class="row">
+								<div class="col-md-12">
+									<label>Data</label>
+								</div>
+								<div class="col-md-12">
+									<span>{{tarefa.data}}</span>
+								</div>			
+							</div>		
+							<div class="row">
+								<div class="col-md-12">
+									<label>Situação</label>
+								</div>
+								<div class="col-md-12">
+									<span ng-show="tarefa.situacao === 1">Nova</span>
+									<span ng-show="tarefa.situacao === 2">Em Andamento</span>
+									<span ng-show="tarefa.situacao === 3">Fechada</span>
+									<span ng-show="tarefa.situacao === 4">Reaberta</span>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-12">
+									<label>Prioridade</label>
+								</div>
+								<div class="col-md-12">
+									<span ng-show="tarefa.prioridade === 1">Baixa</span>
+									<span ng-show="tarefa.prioridade === 2">Normal</span>
+									<span ng-show="tarefa.prioridade === 3">Alta</span>
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal" ng-click="cancelar()">Voltar</button>
+
+						</div>
+					</div><!-- /.modal-content -->
+				</div><!-- /.modal-dialog -->
+			</div><!-- /.modal -->
+
+			<div id="modalExcluir" class="modal fade" tabindex="-1" role="dialog">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+							<h4 class="modal-title">Confirmação</h4>
+						</div>
+						<div class="modal-body">
+							<p>Confirma a exclusão da tarefa <strong>{{tarefa.codigo | zeroAEsquerda:5}}</strong>?</p>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+							<button type="button" class="btn btn-primary" ng-click="excluir()">Confirmar</button>
+						</div>
+					</div><!-- /.modal-content -->
+				</div><!-- /.modal-dialog -->
+			</div><!-- /.modal -->
+			<script src="resources/js/custom.js"></script>
+		</form>
+	</body> 
+	</html>
